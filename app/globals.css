@@ -2,26 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+.react-flow__panel.react-flow__attribution {
+	display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.react-flow .react-flow__handle {
+	@apply w-7 h-7 rounded-full bg-[#784be8];
+}
+.react-flow .react-flow__handle-right {
+	@apply -z-10 hover:-right-3 transition ease-in !cursor-pointer;
+}
+.react-flow .react-flow__handle-left {
+	@apply !pointer-events-none;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.react-flow .react-flow__node {
+	@apply h-24 w-24 flex justify-center items-center border rounded-full;
+}
+
+.react-flow .react-flow__edge path,
+.react-flow__connectionline path {
+	stroke-width: 2;
 }

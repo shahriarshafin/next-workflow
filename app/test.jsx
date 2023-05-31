@@ -38,6 +38,26 @@ const initialNodes = [
 	},
 ];
 
+const initialEdges = [
+	{
+		id: 'e1-2',
+		source: '1',
+		target: '2',
+		label: 'to the',
+		// type: 'step',
+		animated: true,
+	},
+];
+
+const edgeOptions = {
+	animated: true,
+	style: {
+		stroke: '#a854f7',
+		strokeWidth: '2',
+		strokeLinecap: 'round',
+	},
+};
+
 function Flow() {
 	const connectingNodeId = useRef(null);
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -100,14 +120,7 @@ function Flow() {
 				onConnectStart={onConnectStart}
 				// onConnectEnd={onConnectEnd}
 				style={{ backgroundColor: '' }}
-				defaultEdgeOptions={{
-					animated: true,
-					style: {
-						stroke: '#a854f7',
-						strokeWidth: '2',
-						strokeLinecap: 'round',
-					},
-				}}
+				defaultEdgeOptions={edgeOptions}
 				connectionLineStyle={{ stroke: '#a854f7' }}
 				// defaultViewport={{ x: 0, y: 0, zoom: 5 }}
 				// nodeTypes={nodeTypes}
