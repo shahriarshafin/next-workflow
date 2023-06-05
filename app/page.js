@@ -1,5 +1,5 @@
-'use client';
-import React, { useCallback, useState, useRef } from 'react';
+"use client";
+import React, { useCallback, useState, useRef } from "react";
 import ReactFlow, {
 	MiniMap,
 	Controls,
@@ -12,39 +12,41 @@ import ReactFlow, {
 	useOnSelectionChange,
 	useReactFlow,
 	removeElements,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
-import Trigger from './components/Trigger';
-import Action from './components/Action';
+	MarkerType,
+} from "reactflow";
+import "reactflow/dist/style.css";
+import Trigger from "./components/Trigger";
+import Action from "./components/Action";
+import SettingsEdge from "./components/SettingsEdge";
 
 const nodeColor = (node) => {
 	switch (node.type) {
-		case 'input':
-			return '#6ede87';
-		case 'output':
-			return '#6865A5';
+		case "input":
+			return "#6ede87";
+		case "output":
+			return "#6865A5";
 		default:
-			return '#ff0072';
+			return "#ff0072";
 	}
 };
 
 const initialNodes = [
 	{
-		id: '1',
-		sourcePosition: 'right',
-		type: 'input',
+		id: "1",
+		sourcePosition: "right",
+		type: "input",
 		data: { label: <Trigger /> },
 		position: { x: 200, y: 300 },
 	},
 ];
+const edgeTypes = {
+	settingsedge: SettingsEdge,
+};
 
 function Flow() {
 	const connectingNodeId = useRef(null);
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-	// const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-	// console.log(nodes);
 
 	const onConnect = useCallback(
 		(params) => setEdges((eds) => addEdge(params, eds)),
@@ -53,21 +55,19 @@ function Flow() {
 	let nodeIds = 1;
 	const onConnectStart = useCallback((_, { nodeId }) => {
 		connectingNodeId.current = nodeId;
-		console.log(nodeId);
-		console.log(nodes);
-		// .......
-		// console.log(nodes);
 		const id = `${++nodeIds}`;
 		const newNode = {
 			id,
-			sourcePosition: 'right',
-			targetPosition: 'left',
+			sourcePosition: "right",
+			targetPosition: "left",
 			data: {
 				label: <Action />,
 			},
 			position: {
 				x: Math.random() * 500,
 				y: Math.random() * 500,
+				// x: Math.random() * window.innerWidth,
+				// y: Math.random() * window.innerHeight,
 			},
 		};
 
@@ -75,7 +75,14 @@ function Flow() {
 			id: `e${id}-2`,
 			source: nodeId,
 			target: id,
-			label: 'to the',
+			// label: "eitar r kaaj nai",
+			type: "settingsedge",
+			markerEnd: {
+				type: MarkerType.ArrowClosed,
+				width: 15,
+				height: 15,
+				color: "#FF0072",
+			},
 			animated: true,
 		};
 
@@ -89,31 +96,32 @@ function Flow() {
 	const reactFlowInstance = useReactFlow();
 
 	return (
-		<div className='w-screen h-screen'>
+		<div className="w-screen h-screen">
 			<ReactFlow
 				fitView
 				nodes={nodes}
 				edges={edges}
+				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
 				onConnectStart={onConnectStart}
 				// onConnectEnd={onConnectEnd}
-				style={{ backgroundColor: '' }}
+				style={{ backgroundColor: "" }}
 				defaultEdgeOptions={{
 					animated: true,
 					style: {
-						stroke: '#a854f7',
-						strokeWidth: '2',
-						strokeLinecap: 'round',
+						stroke: "#a854f7",
+						strokeWidth: "2",
+						strokeLinecap: "round",
 					},
 				}}
-				connectionLineStyle={{ stroke: '#a854f7' }}
+				connectionLineStyle={{ stroke: "#a854f7" }}
 				// defaultViewport={{ x: 0, y: 0, zoom: 5 }}
 				// nodeTypes={nodeTypes}
 			>
-				<Panel position='top-center'>
-					<h1 className='text-purple-500 font-semibold text-3xl'>
+				<Panel position="top-center">
+					<h1 className="text-purple-500 font-semibold text-3xl">
 						Taskeasy Workflow
 					</h1>
 				</Panel>
@@ -124,10 +132,10 @@ function Flow() {
 					pannable
 					nodeColor={nodeColor}
 					nodeComponent={({ x, y, color }) => (
-						<circle cx={x} cy={y} r='50' fill={color} />
+						<circle cx={x} cy={y} r="50" fill={color} />
 					)}
 				/>
-				<Background variant='dots' color='#e5e5e5' gap={12} size={1} />
+				<Background variant="dots" color="#e5e5e5" gap={12} size={1} />
 			</ReactFlow>
 		</div>
 	);
