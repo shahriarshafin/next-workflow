@@ -1,6 +1,6 @@
 # Next-Workflow
 <p align="center">
-    <img src="https://github.com/shahriarshafin/next-workflow/assets/32214710/6b214a69-1b43-4ce8-98bf-e9be8fa09441" alt="Logo">
+    <img src='https://github.com/shahriarshafin/next-workflow/assets/32214710/fa99adc5-3e42-41a3-9a12-4c1ed999340e' alt="Logo">
 </p>
 
 ## Description
