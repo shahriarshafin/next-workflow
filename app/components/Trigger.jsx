@@ -1,7 +1,8 @@
 import Image from "next/image";
 import GithubLogo from "../../public/github.png";
-import { useState, useRef, useEffect } from "react";
-const Trigger = () => {
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Handle, Position } from "reactflow";
+const Trigger = ({ data, isConnectable }) => {
 	const [option, setOption] = useState(false);
 	const triggerRef = useRef(null);
 
@@ -24,9 +25,25 @@ const Trigger = () => {
 			<div
 				ref={triggerRef}
 				onClick={() => setOption(!option)}
-				className="border hover:border-[1.5px] rounded-full shadow-lg"
+				className="rounded-full shadow-lg cursor-pointer"
 			>
-				<Image src={GithubLogo} style={{ objectFit: "contain" }} alt="" />
+				<Image
+					src={GithubLogo}
+					alt="githubLogo"
+					className="bg-white rounded-full"
+				/>
+			</div>
+			<Handle
+				type="input"
+				position={Position.Right}
+				isConnectable={isConnectable}
+				className="text-white text-center"
+			>
+				+
+			</Handle>
+			<div className="absolute flex flex-col justify-center items-center w-full mt-3 pointer-events-none">
+				<p className="text-lg font-medium">Github</p>
+				<p className="text-xs w-24 text-slate-500">Update a Record</p>
 			</div>
 			{option && (
 				<div className="absolute z-10 top-5 left-24 bg-red-500">
@@ -34,7 +51,7 @@ const Trigger = () => {
 						Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta sint
 						aliquid facere quam cum sapiente eaque iure velit dolor unde! Sed
 						dolorum labore est blanditiis facere expedita, consectetur
-						perferendis itaque.\
+						perferendis itaque.
 					</h1>
 				</div>
 			)}

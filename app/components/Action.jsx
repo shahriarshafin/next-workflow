@@ -1,7 +1,9 @@
 import Image from "next/image";
 import GithubLogo from "../../public/github.png";
 import { useState, useEffect, useRef } from "react";
-const Trigger = () => {
+import { Handle, Position } from "reactflow";
+
+const Action = ({ data, isConnectable }) => {
 	const [option, setOption] = useState(false);
 	const actionRef = useRef(null);
 
@@ -21,12 +23,34 @@ const Trigger = () => {
 
 	return (
 		<div className="relative">
+			<Handle
+				type="target"
+				position={Position.Left}
+				className="!pointer-events-none"
+				isConnectable={isConnectable}
+			/>
 			<div
 				ref={actionRef}
 				onClick={() => setOption(!option)}
-				className="border hover:border-[1.5px] rounded-full shadow-lg"
+				className="rounded-full shadow-lg cursor-pointer"
 			>
-				<Image src={GithubLogo} height={100} width={100} alt="" />
+				<Image
+					src={GithubLogo}
+					alt="githubLogo"
+					className="bg-white rounded-full"
+				/>
+			</div>
+			<Handle
+				type="source"
+				position={Position.Right}
+				isConnectable={isConnectable}
+				className="text-white text-center"
+			>
+				+
+			</Handle>
+			<div className="absolute flex flex-col justify-center items-center w-full mt-3 pointer-events-none">
+				<p className="text-lg font-medium text-slate-800">Github</p>
+				<p className="text-xs w-24 text-slate-500">Update a Record</p>
 			</div>
 			{option && (
 				<div className="absolute z-10 top-5 left-24 bg-red-500">
@@ -37,4 +61,4 @@ const Trigger = () => {
 	);
 };
 
-export default Trigger;
+export default Action;

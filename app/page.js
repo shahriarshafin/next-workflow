@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState, useRef } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import ReactFlow, {
 	MiniMap,
 	Controls,
@@ -13,6 +13,9 @@ import ReactFlow, {
 	useReactFlow,
 	removeElements,
 	MarkerType,
+	getIncomers,
+	getOutgoers,
+	getConnectedEdges,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import Trigger from "./components/Trigger";
@@ -21,24 +24,24 @@ import SettingsEdge from "./components/SettingsEdge";
 
 const nodeColor = (node) => {
 	switch (node.type) {
-		case "input":
+		case "trigger":
 			return "#6ede87";
-		case "output":
+		case "action":
 			return "#6865A5";
 		default:
 			return "#ff0072";
 	}
 };
-
+let nodeIdCounter = 1;
 const initialNodes = [
 	{
-		id: "1",
+		id: `node-${nodeIdCounter++}`,
 		sourcePosition: "right",
-		type: "input",
-		data: { label: <Trigger /> },
+		type: "trigger",
 		position: { x: 200, y: 300 },
 	},
 ];
+const nodeTypes = { trigger: Trigger, action: Action };
 const edgeTypes = {
 	settingsedge: SettingsEdge,
 };
@@ -52,44 +55,85 @@ function Flow() {
 		(params) => setEdges((eds) => addEdge(params, eds)),
 		[setEdges]
 	);
-	let nodeIds = 1;
-	const onConnectStart = useCallback((_, { nodeId }) => {
-		connectingNodeId.current = nodeId;
-		const id = `${++nodeIds}`;
-		const newNode = {
-			id,
-			sourcePosition: "right",
-			targetPosition: "left",
-			data: {
-				label: <Action />,
-			},
-			position: {
-				x: Math.random() * 500,
-				y: Math.random() * 500,
-				// x: Math.random() * window.innerWidth,
-				// y: Math.random() * window.innerHeight,
-			},
-		};
 
-		const newEdge = {
-			id: `e${id}-2`,
-			source: nodeId,
-			target: id,
-			// label: "eitar r kaaj nai",
-			type: "settingsedge",
-			markerEnd: {
-				type: MarkerType.ArrowClosed,
-				width: 15,
-				height: 15,
-				color: "#FF0072",
-			},
-			animated: true,
-		};
+	const onConnectStart = useCallback(
+		(event, { nodeId, handleType }) => {
+			connectingNodeId.current = nodeId;
+			const selectedNode = nodes.find((node) => node.id === nodeId);
 
-		setNodes((prevNodes) => [...prevNodes, newNode]);
-		setEdges((prevEdges) => [...prevEdges, newEdge]);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+			const id = `node-${nodeIdCounter++}`;
+			const newNode = {
+				id,
+				sourcePosition: "right",
+				targetPosition: "left",
+				type: "action",
+				position: {
+					x: selectedNode.position.x + 300,
+					y: selectedNode.position.y,
+				},
+			};
+
+			const newEdge = {
+				id: `e${nodeId}-${id}`,
+				source: nodeId,
+				target: id,
+				type: "settingsedge",
+				markerEnd: {
+					type: MarkerType.ArrowClosed,
+					width: 15,
+					height: 15,
+					color: "#FF0072",
+				},
+				animated: true,
+			};
+
+			setNodes((prevNodes) => [...prevNodes, newNode]);
+			setEdges((prevEdges) => [...prevEdges, newEdge]);
+		},
+		[nodes, setNodes, setEdges]
+	);
+	const onNodesDelete = useCallback(
+		(deleted) => {
+			setEdges(
+				deleted.reduce((acc, node) => {
+					const incomers = getIncomers(node, nodes, edges);
+					const outgoers = getOutgoers(node, nodes, edges);
+					const connectedEdges = getConnectedEdges([node], edges);
+
+					const remainingEdges = acc.filter(
+						(edge) => !connectedEdges.includes(edge)
+					);
+
+					const createdEdges = incomers.flatMap(({ id: source }) =>
+						outgoers.map(({ id: target }) => ({
+							id: `${source}->${target}`,
+							source,
+							target,
+						}))
+					);
+
+					return [...remainingEdges, ...createdEdges];
+				}, edges)
+			);
+		},
+		[setEdges, edges, nodes]
+	);
+
+	const onSave = useCallback(() => {
+		const flow = {
+			nodes: nodes,
+			edges: edges,
+		};
+		localStorage.setItem("flow", JSON.stringify(flow));
+	}, [nodes, edges]);
+
+	const onRestore = useCallback(() => {
+		const flow = JSON.parse(localStorage.getItem("flow"));
+		if (flow) {
+			setNodes(flow.nodes || []);
+			setEdges(flow.edges || []);
+		}
+	}, [setNodes, setEdges]);
 
 	// let nodeId = 1;
 
@@ -101,10 +145,12 @@ function Flow() {
 				fitView
 				nodes={nodes}
 				edges={edges}
+				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
+				onNodesDelete={onNodesDelete}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
-				onConnect={onConnect}
+				// onConnect={onConnect}
 				onConnectStart={onConnectStart}
 				// onConnectEnd={onConnectEnd}
 				style={{ backgroundColor: "" }}
@@ -118,12 +164,15 @@ function Flow() {
 				}}
 				connectionLineStyle={{ stroke: "#a854f7" }}
 				// defaultViewport={{ x: 0, y: 0, zoom: 5 }}
-				// nodeTypes={nodeTypes}
 			>
 				<Panel position="top-center">
 					<h1 className="text-purple-500 font-semibold text-3xl">
 						Taskeasy Workflow
 					</h1>
+				</Panel>
+				<Panel position="top-right">
+					<button onClick={onSave}>Save</button>
+					<button onClick={onRestore}>Restore</button>
 				</Panel>
 				<Controls />
 				<MiniMap
@@ -132,7 +181,7 @@ function Flow() {
 					pannable
 					nodeColor={nodeColor}
 					nodeComponent={({ x, y, color }) => (
-						<circle cx={x} cy={y} r="50" fill={color} />
+						<circle cx={x || 0} cy={y || 0} r="50" fill={color} />
 					)}
 				/>
 				<Background variant="dots" color="#e5e5e5" gap={12} size={1} />

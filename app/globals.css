@@ -6,19 +6,11 @@
 .react-flow__panel.react-flow__attribution {
 	display: none;
 }
-
-.react-flow .react-flow__handle {
-	/* @apply w-7 h-7 rounded-full bg-[#784be8]; */
-}
 .react-flow .react-flow__handle-right {
-	@apply w-7 h-7 rounded-full bg-[#784be8] hover:-right-3 transition-all ease-in !cursor-pointer -z-10;
+	@apply w-7 h-7 rounded-full bg-[#784be8] -right-3 hover:-right-5 transition-all ease-in !cursor-pointer -z-10;
 }
-.react-flow .react-flow__handle-left {
-	@apply !pointer-events-none;
-}
-
 .react-flow .react-flow__node {
-	@apply h-24 w-24 flex justify-center items-center rounded-full shadow-xl hover:shadow-xl border transition-colors ease-in hover:border-[#B5A2DC];
+	@apply h-24 w-24 flex justify-center items-center rounded-full shadow-xl border-4 transition-colors ease-in hover:border-[#B5A2DC];
 }
 
 .react-flow .react-flow__edge path,
