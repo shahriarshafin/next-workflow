@@ -5,7 +5,7 @@
 
 ## Description
 
-Next-Workflow is a web application built using React and Next.js. It provides a streamlined workflow for creating and managing React applications.
+Next-Workflow is a web application built using React and Next.js. It provides a streamlined workflow for creating node-based editors and interactive diagrams.
 
 ## Installation
 
