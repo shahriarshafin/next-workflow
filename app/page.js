@@ -51,7 +51,6 @@ function Flow() {
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const reactFlowInstance = useReactFlow();
-
 	const onConnect = useCallback(
 		(params) => setEdges((eds) => addEdge(params, eds)),
 		[setEdges]
@@ -91,33 +90,51 @@ function Flow() {
 			setNodes((prevNodes) => [...prevNodes, newNode]);
 			setEdges((prevEdges) => [...prevEdges, newEdge]);
 		},
-		[nodes, setNodes, setEdges]
+		[nodes, edges, setNodes, setEdges]
 	);
-	const onNodesDelete = useCallback(
-		(deleted) => {
-			setEdges(
-				deleted.reduce((acc, node) => {
-					const incomers = getIncomers(node, nodes, edges);
-					const outgoers = getOutgoers(node, nodes, edges);
-					const connectedEdges = getConnectedEdges([node], edges);
 
-					const remainingEdges = acc.filter(
-						(edge) => !connectedEdges.includes(edge)
-					);
+	const onNodeContextMenu = useCallback(
+		(event, node) => {
+			event.preventDefault();
 
-					const createdEdges = incomers.flatMap(({ id: source }) =>
-						outgoers.map(({ id: target }) => ({
-							id: `${source}->${target}`,
-							source,
-							target,
-						}))
-					);
+			const isInitialNode = initialNodes.some(
+				(initialNode) => initialNode.id === node.id
+			);
+			if (isInitialNode) {
+				return;
+			}
 
-					return [...remainingEdges, ...createdEdges];
-				}, edges)
+			setNodes((prevNodes) => prevNodes.filter((n) => n.id !== node.id));
+			setEdges((prevEdges) =>
+				prevEdges.filter(
+					(edge) => edge.source !== node.id && edge.target !== node.id
+				)
+			);
+
+			const incomingNodes = getIncomers(node, nodes, edges);
+			const outgoingNodes = getOutgoers(node, nodes, edges);
+
+			incomingNodes.forEach((incomingNode) =>
+				outgoingNodes.forEach((outgoingNode) => {
+					const newEdge = {
+						id: `${incomingNode.id}-to-${outgoingNode.id}`,
+						source: incomingNode.id,
+						target: outgoingNode.id,
+						type: "settingsedge",
+						markerEnd: {
+							type: MarkerType.ArrowClosed,
+							width: 15,
+							height: 15,
+							color: "#FF0072",
+						},
+						animated: true,
+					};
+
+					setEdges((prevEdges) => [...prevEdges, newEdge]);
+				})
 			);
 		},
-		[setEdges, edges, nodes]
+		[nodes, edges, setNodes, setEdges]
 	);
 
 	const onSave = useCallback(() => {
@@ -144,9 +161,9 @@ function Flow() {
 				edges={edges}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
-				onNodesDelete={onNodesDelete}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
+				onNodeContextMenu={onNodeContextMenu}
 				// onConnect={onConnect}
 				onConnectStart={onConnectStart}
 				// onConnectEnd={onConnectEnd}
