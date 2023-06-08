@@ -61,10 +61,9 @@ function Flow() {
 		(event, { nodeId, handleType }) => {
 			connectingNodeId.current = nodeId;
 			const selectedNode = nodes.find((node) => node.id === nodeId);
+			if (edges.some((edge) => edge.source === nodeId)) return;
 
-			// const id = `node-${nodeIdCounter++}`;
 			const newNode = {
-				// id,
 				id: `${parseInt(selectedNode.id) + 1}`,
 				sourcePosition: "right",
 				targetPosition: "left",
