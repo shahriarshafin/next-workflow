@@ -35,7 +35,7 @@ const nodeColor = (node) => {
 let nodeIdCounter = 1;
 const initialNodes = [
 	{
-		id: `node-${nodeIdCounter++}`,
+		id: `${nodeIdCounter++}`,
 		sourcePosition: "right",
 		type: "trigger",
 		position: { x: 200, y: 300 },
@@ -50,6 +50,7 @@ function Flow() {
 	const connectingNodeId = useRef(null);
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+	const reactFlowInstance = useReactFlow();
 
 	const onConnect = useCallback(
 		(params) => setEdges((eds) => addEdge(params, eds)),
@@ -61,9 +62,10 @@ function Flow() {
 			connectingNodeId.current = nodeId;
 			const selectedNode = nodes.find((node) => node.id === nodeId);
 
-			const id = `node-${nodeIdCounter++}`;
+			// const id = `node-${nodeIdCounter++}`;
 			const newNode = {
-				id,
+				// id,
+				id: `${parseInt(selectedNode.id) + 1}`,
 				sourcePosition: "right",
 				targetPosition: "left",
 				type: "action",
@@ -74,9 +76,9 @@ function Flow() {
 			};
 
 			const newEdge = {
-				id: `e${nodeId}-${id}`,
+				id: `${nodeId}-to-${parseInt(selectedNode.id) + 1}`,
 				source: nodeId,
-				target: id,
+				target: `${parseInt(selectedNode.id) + 1}`,
 				type: "settingsedge",
 				markerEnd: {
 					type: MarkerType.ArrowClosed,
@@ -134,10 +136,6 @@ function Flow() {
 			setEdges(flow.edges || []);
 		}
 	}, [setNodes, setEdges]);
-
-	// let nodeId = 1;
-
-	const reactFlowInstance = useReactFlow();
 
 	return (
 		<div className="w-screen h-screen">
