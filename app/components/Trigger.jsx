@@ -21,16 +21,15 @@ const Trigger = ({ data, isConnectable }) => {
 	}, []);
 
 	return (
-		<div className="relative">
+		<div ref={triggerRef} className="relative">
 			<div
-				ref={triggerRef}
 				onClick={() => setOption(!option)}
 				className="rounded-full shadow-lg cursor-pointer"
 			>
 				<Image
 					src={GithubLogo}
 					alt="githubLogo"
-					className="bg-white rounded-full"
+					className="bg-white rounded-full flex justify-center items-center"
 				/>
 			</div>
 			<Handle

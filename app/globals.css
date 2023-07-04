@@ -12,7 +12,6 @@
 .react-flow .react-flow__node {
 	@apply h-24 w-24 flex justify-center items-center rounded-full shadow-xl border-4 transition-colors ease-in hover:border-[#B5A2DC];
 }
-
 .react-flow .react-flow__edge path,
 .react-flow__connectionline path {
 	stroke-width: 2;

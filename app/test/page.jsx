@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import ReactFlow, {
 	MiniMap,
 	Controls,
@@ -14,8 +14,7 @@ import ReactFlow, {
 	removeElements,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import Trigger from './components/Trigger';
-import Action from './components/Action';
+import Trigger from '@app/components/CustomComp';
 
 const nodeColor = (node) => {
 	switch (node.type) {
@@ -27,13 +26,31 @@ const nodeColor = (node) => {
 			return '#ff0072';
 	}
 };
+const WorkflowActions = [
+	{
+		action: { id: 55, name: 'sent message' },
+		app: { name: 'slack' },
+	},
+	{
+		action: { id: 55, name: 'sent ssm' },
+		app: { name: 'slack' },
+	},
+	{
+		action: { id: 55, name: 'ejwkdhgkjc' },
+		app: { name: 'slack' },
+	},
+	{
+		action: { id: 55, name: 'cygsydtf' },
+		app: { name: 'slack' },
+	},
+];
 
 const initialNodes = [
 	{
 		id: '1',
 		sourcePosition: 'right',
 		type: 'input',
-		data: { label: <Trigger /> },
+		label: 'ok',
 		position: { x: 200, y: 300 },
 	},
 ];
@@ -61,10 +78,22 @@ const edgeOptions = {
 function Flow() {
 	const connectingNodeId = useRef(null);
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-	// const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+	// const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-	// console.log(nodes);
+	useEffect(() => {
+		const newNodes = WorkflowActions.map((action, index) => ({
+			id: String(index + 2),
+			sourcePosition: 'right',
+			targetPosition: 'left',
+			data: {
+				label: action.action.name,
+			},
+			position: { x: 200 + (index + 1) * 200, y: 300 },
+		}));
+
+		setNodes((prevNodes) => [...prevNodes, ...newNodes]);
+	}, [setNodes]);
 
 	const onConnect = useCallback(
 		(params) => setEdges((eds) => addEdge(params, eds)),
@@ -83,7 +112,7 @@ function Flow() {
 			sourcePosition: 'right',
 			targetPosition: 'left',
 			data: {
-				label: <Action />,
+				label: 'here',
 			},
 			position: {
 				x: Math.random() * 500,
