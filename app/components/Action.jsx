@@ -50,7 +50,7 @@ const Action = ({ data, isConnectable }) => {
 			</Handle>
 			<div className="absolute flex flex-col justify-center items-center w-full mt-3 pointer-events-none">
 				<p className="text-lg font-medium text-slate-800">Github</p>
-				<p className="text-[2px] w-24 text-slate-500">Update a Record</p>
+				<p className="text-xs w-24 text-slate-500">Update a Record</p>
 			</div>
 			{option && (
 				<div className="absolute z-10 top-5 left-24 bg-red-500">
